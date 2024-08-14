@@ -15,6 +15,18 @@ EditorBuildSettings:
     path: Assets/Scenes/Menu.unity
     guid: 1bfb164460aab984c8667c2f559ea3a9
   - enabled: 1
-    path: Assets/Scenes/Game.unity
+    path: Assets/Scenes/PreGame.unity
     guid: 99c9720ab356a0642a771bea13969a05
+  - enabled: 1
+    path: Assets/Scenes/Map1.unity
+    guid: 43464c14d99f7e94684ed4a953a4eebe
+  - enabled: 1
+    path: Assets/Scenes/Map2.unity
+    guid: cedeb4d6fa7b83846b9214d01fb744da
+  - enabled: 1
+    path: Assets/Scenes/Map3.unity
+    guid: ba70e47f2510fdd45b6656ce668c8270
+  - enabled: 1
+    path: Assets/Scenes/Map4.unity
+    guid: 9a2a809628d88c142bfe97caeb4b0d76
   m_configObjects: {}

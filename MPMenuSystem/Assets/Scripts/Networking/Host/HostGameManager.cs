@@ -22,7 +22,7 @@ public class HostGameManager : IDisposable
     public string JoinCode { get; private set; }
     public NetworkServer NetworkServer { get; private set; }
     private const int MaxConnections = 4;
-    private const string GameSceneName = "Game";
+    private const string PreGameSceneName = "PreGame";
 
     public HostGameManager(NetworkObject playerPrefab)
     {
@@ -98,7 +98,14 @@ public class HostGameManager : IDisposable
 
         NetworkServer.OnClientLeft += HandleClientLeft;
 
-        NetworkManager.Singleton.SceneManager.LoadScene(GameSceneName, LoadSceneMode.Single);
+        NetworkManager.Singleton.SceneManager.LoadScene(PreGameSceneName, LoadSceneMode.Single);
+    }
+
+    public async Task ChangeSceneAsync(string SceneName) // take in scene name from PreGameHUD
+    {
+        await Task.Delay(1000);
+        Debug.Log("Waiting to change");
+        NetworkManager.Singleton.SceneManager.LoadScene(SceneName, LoadSceneMode.Single);
     }
 
     private IEnumerator HeartbeatLobby(float waitTimeSeconds)

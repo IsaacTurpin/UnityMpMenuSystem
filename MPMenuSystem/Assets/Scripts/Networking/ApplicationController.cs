@@ -15,7 +15,7 @@ public class ApplicationController : MonoBehaviour
 
     private ApplicationData appData;
 
-    private const string GameSceneName = "Game";
+    private const string PreGameSceneName = "PreGame";
 
     private async void Start()
     {
