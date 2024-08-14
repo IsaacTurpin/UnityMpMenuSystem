@@ -18,7 +18,6 @@ public class ClientGameManager : IDisposable
     private JoinAllocation allocation;
     private const string MenuSceneName = "Menu";
     private NetworkClient networkClient;
-    private MatchplayMatchmaker matchmaker;
     public UserData UserData { get; private set; }
 
     public async Task<bool> InitAsync()
@@ -26,7 +25,6 @@ public class ClientGameManager : IDisposable
         await UnityServices.InitializeAsync();
 
         networkClient = new NetworkClient(NetworkManager.Singleton);
-        matchmaker = new MatchplayMatchmaker();
 
         AuthState authState = await AuthenticationWrapper.DoAuth();
 
@@ -83,32 +81,6 @@ public class ClientGameManager : IDisposable
         NetworkManager.Singleton.NetworkConfig.ConnectionData = payloadBytes;
 
         NetworkManager.Singleton.StartClient();
-    }
-
-    public async void MatchmakeAsync(bool isTeamQueue, Action<MatchmakerPollingResult> onMatchmakeResponse)
-    {
-        if (matchmaker.IsMatchmaking) return;
-
-        UserData.userGamePreferences.gameQueue = isTeamQueue ? GameQueue.Team : GameQueue.Solo;
-        MatchmakerPollingResult matchResult = await GetMatchAsyc();
-        onMatchmakeResponse?.Invoke(matchResult);
-    }
-
-    private async Task<MatchmakerPollingResult> GetMatchAsyc()
-    {
-        MatchmakingResult matchmakingResult = await matchmaker.Matchmake(UserData);
-
-        if(matchmakingResult.result == MatchmakerPollingResult.Success)
-        {
-            StartClient(matchmakingResult.ip, matchmakingResult.port);
-        }
-
-        return matchmakingResult.result;
-    }
-
-    public async Task CancelMatchmaking()
-    {
-        await matchmaker.CancelMatchmaking();
     }
 
     public void Disconnect()

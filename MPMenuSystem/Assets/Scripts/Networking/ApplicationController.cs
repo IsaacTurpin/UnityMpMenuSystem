@@ -11,8 +11,6 @@ public class ApplicationController : MonoBehaviour
 
     [SerializeField] private HostSingleton hostPrefab;
 
-    [SerializeField] private ServerSingleton serverPrefab;
-
     [SerializeField] private NetworkObject playerPrefab;
 
     private ApplicationData appData;
@@ -23,48 +21,20 @@ public class ApplicationController : MonoBehaviour
     {
         DontDestroyOnLoad(gameObject);
 
-        await LaunchInMode(SystemInfo.graphicsDeviceType == UnityEngine.Rendering.GraphicsDeviceType.Null);
+        await LaunchInMode();
     }
 
-    private async Task LaunchInMode(bool isDedicatedServer)
+    private async Task LaunchInMode()
     {
-        if(isDedicatedServer)
+        HostSingleton hostSingleton = Instantiate(hostPrefab);
+        hostSingleton.CreateHost(playerPrefab);
+
+        ClientSingleton clientSingleton = Instantiate(clientPrefab);
+        bool authenticated = await clientSingleton.CreateClient();
+
+        if (authenticated)
         {
-            Application.targetFrameRate = 60;
-
-            appData = new ApplicationData();
-            ServerSingleton serverSingleton = Instantiate(serverPrefab);
-            StartCoroutine(LoadGameSceneAsync(serverSingleton));
+            clientSingleton.GameManager.GoToMenu();
         }
-        else
-        {
-            HostSingleton hostSingleton = Instantiate(hostPrefab);
-            hostSingleton.CreateHost(playerPrefab);
-
-            ClientSingleton clientSingleton = Instantiate(clientPrefab);
-            bool authenticated = await clientSingleton.CreateClient();
-
-            if(authenticated) 
-            {
-                clientSingleton.GameManager.GoToMenu();
-            }
-        }
-    }
-
-    private IEnumerator LoadGameSceneAsync(ServerSingleton serverSingleton)
-    {
-        AsyncOperation asyncOperation = SceneManager.LoadSceneAsync(GameSceneName);
-
-        while(!asyncOperation.isDone)
-        {
-            yield return null;
-        }
-
-        Task createServerTask = serverSingleton.CreateServer(playerPrefab);
-        yield return new WaitUntil(() => createServerTask.IsCompleted);
-
-        Task startServerTask = serverSingleton.GameManager.StartGameServerAsync();
-        yield return new WaitUntil(() => startServerTask.IsCompleted);
-
     }
 }
