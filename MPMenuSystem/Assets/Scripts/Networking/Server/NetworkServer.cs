@@ -54,7 +54,7 @@ public class NetworkServer : IDisposable
     {
         await Task.Delay(1000);
 
-        NetworkObject playerInstance = GameObject.Instantiate(playerPrefab, /*SpawnPoint.GetRandomSpawnPos()*/ Vector3.zero, Quaternion.identity);
+        NetworkObject playerInstance = GameObject.Instantiate(playerPrefab, SpawnPoint.GetRandomSpawnPos(), Quaternion.identity);
 
         playerInstance.SpawnAsPlayerObject(clientId);
     }

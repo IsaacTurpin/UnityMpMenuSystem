@@ -104,7 +104,6 @@ public class HostGameManager : IDisposable
     public async Task ChangeSceneAsync(string SceneName) // take in scene name from PreGameHUD
     {
         await Task.Delay(1000);
-        Debug.Log("Waiting to change");
         NetworkManager.Singleton.SceneManager.LoadScene(SceneName, LoadSceneMode.Single);
     }
 

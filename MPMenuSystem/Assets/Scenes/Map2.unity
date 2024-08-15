@@ -976,6 +976,12 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   lobbyCodeText: {fileID: 2017068313}
+  map1Toggle: {fileID: 0}
+  map2Toggle: {fileID: 0}
+  map3Toggle: {fileID: 0}
+  map4Toggle: {fileID: 0}
+  hostHUD: {fileID: 0}
+  clientHUD: {fileID: 0}
 --- !u!1 &1514310533
 GameObject:
   m_ObjectHideFlags: 0
