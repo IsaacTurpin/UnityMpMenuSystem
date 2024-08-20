@@ -4,6 +4,8 @@ using System.Collections.Generic;
 using TMPro;
 using Unity.Collections;
 using Unity.Netcode;
+using Unity.Services.Lobbies;
+using Unity.Services.Lobbies.Models;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -11,7 +13,10 @@ public class PreGameHUD : NetworkBehaviour
 {
     [SerializeField] private TMP_Text lobbyCodeText;
 
+    private NetworkManager networkManager;
+
     private NetworkVariable<FixedString32Bytes> lobbyCode = new NetworkVariable<FixedString32Bytes>("");
+    public NetworkVariable<int> numPlayersReady = new NetworkVariable<int>();
 
     private string MapSceneName = string.Empty;
     private const string Map1Name = "Map1";
@@ -26,14 +31,34 @@ public class PreGameHUD : NetworkBehaviour
     [SerializeField] GameObject hostHUD;
     [SerializeField] GameObject clientHUD;
 
+    [SerializeField] private GameObject readyUpButton;
+    [SerializeField] private GameObject unreadyButton;
+    [SerializeField] private GameObject hostReadyUpButton;
+    [SerializeField] private GameObject hostUnreadyButton;
+    [SerializeField] private TMP_Text WaitingForHostText;
+    [SerializeField] private TMP_Text playersOutOfPlayersText;
+
+    const string waitingString = "Waiting for Host...";
+    
+
     public override void OnNetworkSpawn()
     {
-        if(IsClient)
+        networkManager = FindAnyObjectByType<NetworkManager>();
+
+        networkManager.OnClientDisconnectCallback += HandleClientLeft;
+
+        if (IsClient)
         {
             lobbyCode.OnValueChanged += HandleLobbyCodeChanged;
             HandleLobbyCodeChanged(string.Empty, lobbyCode.Value);
-            if(hostHUD) hostHUD.SetActive(false);
+
+            numPlayersReady.OnValueChanged += HandlePlayersReadyChanged;
+            HandlePlayersReadyChanged(0, numPlayersReady.Value);
+            UpdateReadyText();
+
+            if (hostHUD) hostHUD.SetActive(false);
             if(clientHUD) clientHUD.SetActive(true);
+            if (WaitingForHostText) WaitingForHostText.text = string.Empty;
         }
 
         if (!IsHost) return;
@@ -44,12 +69,47 @@ public class PreGameHUD : NetworkBehaviour
         lobbyCode.Value = HostSingleton.Instance.GameManager.JoinCode;
     }
 
+    private void HandleClientLeft(ulong obj)
+    {
+        if(IsServer)
+        {
+            StartCoroutine(RefreshPlayerNumText());
+            
+            playersOutOfPlayersText.text = $"{numPlayersReady.Value}/{NetworkManager.Singleton.ConnectedClients.Count}";
+            Debug.Log("Server made it here");
+        }
+        
+        Debug.Log("made it here");
+    }
+
+    IEnumerator RefreshPlayerNumText()
+    {
+        yield return new WaitForSeconds(0.2f);
+
+        numPlayersReady.Value -= 1;
+    }
+
     public override void OnNetworkDespawn()
     {
+        networkManager.OnClientDisconnectCallback -= HandleClientLeft;
+
         if (IsClient)
         {
             lobbyCode.OnValueChanged -= HandleLobbyCodeChanged;
+            numPlayersReady.OnValueChanged -= HandlePlayersReadyChanged;
         }
+    }
+
+    private void UpdateReadyText()
+    {
+        if (playersOutOfPlayersText == null) return;
+        playersOutOfPlayersText.text = $"{numPlayersReady.Value}/{NetworkManager.Singleton.ConnectedClients.Count}";
+    }
+
+    private void HandlePlayersReadyChanged(int previousValue, int newValue)
+    {
+        numPlayersReady.Value = newValue;
+        UpdateReadyText();
     }
 
     public void GetMapSceneName()
@@ -74,11 +134,16 @@ public class PreGameHUD : NetworkBehaviour
         {
             MapSceneName = string.Empty;
         }
+
+        Debug.Log(numPlayersReady.Value);
     }
 
     public async void StartGame()
     {
         if (MapSceneName == string.Empty) return;
+
+        Debug.Log(NetworkManager.Singleton.ConnectedClients.Count);
+
         await HostSingleton.Instance.GameManager.ChangeSceneAsync(MapSceneName);
     }
 
@@ -90,6 +155,59 @@ public class PreGameHUD : NetworkBehaviour
         }
 
         ClientSingleton.Instance.GameManager.Disconnect();
+
+        UpdateReadyText();
+    }
+
+    public void ReadyUp()
+    {
+        if(IsHost)
+        {
+            UpdateReadyPlayersServerRpc(true);
+            hostReadyUpButton.SetActive(false);
+            hostUnreadyButton.SetActive(true);
+            WaitingForHostText.text = waitingString;
+        }
+        else
+        {
+            UpdateReadyPlayersServerRpc(true);
+            readyUpButton.SetActive(false);
+            unreadyButton.SetActive(true);
+            WaitingForHostText.text = waitingString;
+        }
+
+    }
+
+    public void Unready()
+    {
+        if(IsHost)
+        {
+            UpdateReadyPlayersServerRpc(false);
+            hostUnreadyButton.SetActive(false);
+            hostReadyUpButton.SetActive(true);
+            WaitingForHostText.text = string.Empty;
+        }
+        else
+        {
+            UpdateReadyPlayersServerRpc(false);
+            unreadyButton.SetActive(false);
+            readyUpButton.SetActive(true);
+            WaitingForHostText.text = string.Empty;
+        }
+
+    }
+
+    [ServerRpc(RequireOwnership = false)]
+    private void UpdateReadyPlayersServerRpc(bool increase)
+    {
+        if(increase)
+        {
+            numPlayersReady.Value += 1;
+        }
+        else
+        {
+            numPlayersReady.Value -= 1;
+        }
     }
 
     private void HandleLobbyCodeChanged(FixedString32Bytes oldCode, FixedString32Bytes newCode)
