@@ -45,8 +45,6 @@ public class PreGameHUD : NetworkBehaviour
     {
         networkManager = FindAnyObjectByType<NetworkManager>();
 
-        networkManager.OnClientDisconnectCallback += HandleClientLeft;
-
         if (IsClient)
         {
             lobbyCode.OnValueChanged += HandleLobbyCodeChanged;
@@ -61,6 +59,9 @@ public class PreGameHUD : NetworkBehaviour
             if (WaitingForHostText) WaitingForHostText.text = string.Empty;
         }
 
+        networkManager.OnClientDisconnectCallback += HandleClientLeft;
+        networkManager.OnClientConnectedCallback += HandleClientJoined;
+
         if (!IsHost) return;
 
         if (hostHUD) hostHUD.SetActive(true);
@@ -69,29 +70,39 @@ public class PreGameHUD : NetworkBehaviour
         lobbyCode.Value = HostSingleton.Instance.GameManager.JoinCode;
     }
 
+    private void HandleClientJoined(ulong obj)
+    {
+        if (IsServer)
+        {
+            StartCoroutine(RefreshPlayerNumText(false));
+
+            if(playersOutOfPlayersText) playersOutOfPlayersText.text = $"{numPlayersReady.Value}/{NetworkManager.Singleton.ConnectedClients.Count}";
+        }
+    }
+
     private void HandleClientLeft(ulong obj)
     {
         if(IsServer)
         {
-            StartCoroutine(RefreshPlayerNumText());
-            
-            playersOutOfPlayersText.text = $"{numPlayersReady.Value}/{NetworkManager.Singleton.ConnectedClients.Count}";
-            Debug.Log("Server made it here");
+            StartCoroutine(RefreshPlayerNumText(true));
+            if(playersOutOfPlayersText) playersOutOfPlayersText.text = $"{numPlayersReady.Value}/{NetworkManager.Singleton.ConnectedClients.Count}";
         }
         
-        Debug.Log("made it here");
     }
 
-    IEnumerator RefreshPlayerNumText()
+    IEnumerator RefreshPlayerNumText(bool minus)
     {
         yield return new WaitForSeconds(0.2f);
-
-        numPlayersReady.Value -= 1;
+        if(minus)
+        {
+            numPlayersReady.Value -= 1;
+        }
     }
 
     public override void OnNetworkDespawn()
     {
         networkManager.OnClientDisconnectCallback -= HandleClientLeft;
+        networkManager.OnClientConnectedCallback -= HandleClientJoined;
 
         if (IsClient)
         {
@@ -141,8 +152,7 @@ public class PreGameHUD : NetworkBehaviour
     public async void StartGame()
     {
         if (MapSceneName == string.Empty) return;
-
-        Debug.Log(NetworkManager.Singleton.ConnectedClients.Count);
+        if (numPlayersReady.Value != NetworkManager.Singleton.ConnectedClients.Count) return;
 
         await HostSingleton.Instance.GameManager.ChangeSceneAsync(MapSceneName);
     }
