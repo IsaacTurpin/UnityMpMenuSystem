@@ -47,17 +47,17 @@ public class PreGameHUD : NetworkBehaviour
 
         if (IsClient)
         {
-            lobbyCode.OnValueChanged += HandleLobbyCodeChanged;
-            HandleLobbyCodeChanged(string.Empty, lobbyCode.Value);
-
-            numPlayersReady.OnValueChanged += HandlePlayersReadyChanged;
-            HandlePlayersReadyChanged(0, numPlayersReady.Value);
-            UpdateReadyText();
-
             if (hostHUD) hostHUD.SetActive(false);
             if(clientHUD) clientHUD.SetActive(true);
             if (WaitingForHostText) WaitingForHostText.text = string.Empty;
         }
+
+        lobbyCode.OnValueChanged += HandleLobbyCodeChanged;
+        HandleLobbyCodeChanged(string.Empty, lobbyCode.Value);
+
+        numPlayersReady.OnValueChanged += HandlePlayersReadyChanged;
+        HandlePlayersReadyChanged(0, numPlayersReady.Value);
+        UpdateReadyText();
 
         networkManager.OnClientDisconnectCallback += HandleClientLeft;
         networkManager.OnClientConnectedCallback += HandleClientJoined;
@@ -119,8 +119,15 @@ public class PreGameHUD : NetworkBehaviour
 
     private void HandlePlayersReadyChanged(int previousValue, int newValue)
     {
-        numPlayersReady.Value = newValue;
-        UpdateReadyText();
+        if(IsServer)
+        {
+            numPlayersReady.Value = newValue;
+            UpdateReadyText();
+        }
+        if(IsClient && !IsHost)
+        {
+            UpdateReadyText();
+        }
     }
 
     public void GetMapSceneName()
@@ -145,8 +152,6 @@ public class PreGameHUD : NetworkBehaviour
         {
             MapSceneName = string.Empty;
         }
-
-        Debug.Log(numPlayersReady.Value);
     }
 
     public async void StartGame()
@@ -185,7 +190,6 @@ public class PreGameHUD : NetworkBehaviour
             unreadyButton.SetActive(true);
             WaitingForHostText.text = waitingString;
         }
-
     }
 
     public void Unready()
@@ -204,7 +208,6 @@ public class PreGameHUD : NetworkBehaviour
             readyUpButton.SetActive(true);
             WaitingForHostText.text = string.Empty;
         }
-
     }
 
     [ServerRpc(RequireOwnership = false)]
