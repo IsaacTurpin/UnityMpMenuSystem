@@ -25,7 +25,7 @@ public class ZPlayer : NetworkBehaviour
     public static event Action<ZPlayer> OnPlayerSpawned;
     public static event Action<ZPlayer> OnPlayerDespawned;
 
-    public bool paused = false;
+    public bool completed = false;
 
     public override void OnNetworkSpawn()
     {
@@ -76,15 +76,11 @@ public class ZPlayer : NetworkBehaviour
             if(SceneManager.GetActiveScene().name != "PreGame")
             {
                 //starterAssetsInputs?.SetCursorState(false);
-                if (!paused)//not paused
+                if (!completed)//not already set
                 {
                     starterAssetsInputs?.SetCursorState(true);
                     Debug.Log("not paused not Pregame");
-                }
-                if (paused)//paused
-                {
-                    starterAssetsInputs?.SetCursorState(false);
-                    Debug.Log("paused not Pregame");
+                    completed = true;
                 }
             }
         }

@@ -13,12 +13,11 @@ public class PauseMenu : MonoBehaviour
     [SerializeField] private GameObject lobbyCodeObject;
     [SerializeField] private GameObject leaveGameObject;
 
-    ZPlayer zPlayer;
 
     // Start is called before the first frame update
     void Start()
     {
-        zPlayer = FindAnyObjectByType<ZPlayer>();
+
     }
 
     private void OnEnable()
@@ -58,16 +57,18 @@ public class PauseMenu : MonoBehaviour
     {
         leaveGameObject?.SetActive(true);
         lobbyCodeObject?.SetActive(true);
+        Cursor.lockState = CursorLockMode.None;
+        Cursor.visible = true;
         GameIsPaused = true;
-        zPlayer.paused = true;
         Debug.Log("Pause");
     }
     private void RemovePauseScreen()
     {
         leaveGameObject?.SetActive(false);
         lobbyCodeObject?.SetActive(false);
+        Cursor.lockState = CursorLockMode.Confined;
+        Cursor.visible = false;
         GameIsPaused = false;
-        zPlayer.paused = false;
         Debug.Log("Resume");
     }
 }
