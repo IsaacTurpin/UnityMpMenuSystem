@@ -585,7 +585,7 @@ MonoBehaviour:
     type: 3}
   hostPrefab: {fileID: 1195450687783604157, guid: 0e9f0ef0fa7feb3429553b5a4feca3e4,
     type: 3}
-  playerPrefab: {fileID: 4811848599904654579, guid: c8bbb98c1bea6a54ea9ab3801edf1bb0,
+  playerPrefab: {fileID: 7315530435793899576, guid: 8f6e48a2149e53f4d9645fa2c7248d0c,
     type: 3}
 --- !u!4 &1083444180
 Transform:

@@ -5,12 +5,15 @@ using UnityEngine;
 using Cinemachine;
 using Unity.Collections;
 using System;
+using UnityEngine.SceneManagement;
+using StarterAssets;
 
 public class ZPlayer : NetworkBehaviour
 {
     [Header("References")]
     [SerializeField] private CinemachineVirtualCamera virtualCamera;
     [SerializeField] private Texture2D crosshair;
+    private StarterAssetsInputs starterAssetsInputs;
     //[field: SerializeField] public Health Health {  get; private set; }
 
     [Header("Settings")]
@@ -21,6 +24,8 @@ public class ZPlayer : NetworkBehaviour
 
     public static event Action<ZPlayer> OnPlayerSpawned;
     public static event Action<ZPlayer> OnPlayerDespawned;
+
+    public bool paused = false;
 
     public override void OnNetworkSpawn()
     {
@@ -46,7 +51,13 @@ public class ZPlayer : NetworkBehaviour
         {
             virtualCamera.Priority = ownerPriority;
 
-            Cursor.SetCursor(crosshair, new Vector2(crosshair.width / 2, crosshair.height / 2), CursorMode.Auto);
+            starterAssetsInputs = GetComponent<StarterAssetsInputs>();
+
+            if (crosshair != null && SceneManager.GetActiveScene().name == "Menu")
+            {
+                Cursor.SetCursor(crosshair, new Vector2(crosshair.width / 2, crosshair.height / 2), CursorMode.Auto);
+            }
+            
         }
     }
 
@@ -55,6 +66,27 @@ public class ZPlayer : NetworkBehaviour
         if (IsServer)
         {
             OnPlayerDespawned?.Invoke(this);
+        }
+    }
+
+    private void Update()
+    {
+        if(IsOwner)
+        {
+            if(SceneManager.GetActiveScene().name != "PreGame")
+            {
+                //starterAssetsInputs?.SetCursorState(false);
+                if (!paused)//not paused
+                {
+                    starterAssetsInputs?.SetCursorState(true);
+                    Debug.Log("not paused not Pregame");
+                }
+                if (paused)//paused
+                {
+                    starterAssetsInputs?.SetCursorState(false);
+                    Debug.Log("paused not Pregame");
+                }
+            }
         }
     }
 }
