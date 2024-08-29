@@ -102,6 +102,7 @@ namespace StarterAssets
         private int _animIDJump;
         private int _animIDFreeFall;
         private int _animIDMotionSpeed;
+        private int _animIDDecider;
 
 #if ENABLE_INPUT_SYSTEM 
         private PlayerInput _playerInput;
@@ -197,6 +198,7 @@ namespace StarterAssets
             _animIDJump = Animator.StringToHash("Jump");
             _animIDFreeFall = Animator.StringToHash("FreeFall");
             _animIDMotionSpeed = Animator.StringToHash("MotionSpeed");
+            _animIDDecider = Animator.StringToHash("Decider");
         }
 
         private void GroundedCheck()
@@ -332,8 +334,28 @@ namespace StarterAssets
             // update animator if using character
             if (_hasAnimator)
             {
-                _animator.SetFloat(_animIDSpeed, _animationBlend);
+                _animator.SetFloat(_animIDSpeed, _speed);
                 _animator.SetFloat(_animIDMotionSpeed, inputMagnitude);
+                if (_input.move.x > 0.2)
+                {
+                    Debug.Log("Strafe Right");
+                    _animator.SetFloat(_animIDDecider, 4); // 4 = strafe right
+                }
+                if (_input.move.x < -0.2)
+                {
+                    Debug.Log("Strafe Left");
+                    _animator.SetFloat(_animIDDecider, 5); // 5 = strafe left
+                }
+                if (_input.move.y > 0.2)
+                {
+                    Debug.Log("Forward");
+                    _animator.SetFloat(_animIDDecider, 2); // 2 = forward
+                }
+                if (_input.move.y < -0.2)
+                {
+                    Debug.Log("Backward");
+                    _animator.SetFloat(_animIDDecider, 3); // 3 = backward
+                }
             }
         }
 
