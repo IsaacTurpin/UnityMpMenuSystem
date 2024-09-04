@@ -715,7 +715,21 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5829cf33ebebb2d4fb416693df53d51f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  TransitionStateInfoList: []
+  TransitionStateInfoList:
+  - IsCrossFadeExit: 0
+    Layer: 0
+    OriginatingState: 736477623
+    DestinationState: 125937960
+    TransitionDuration: 0.25
+    TriggerNameHash: 125937960
+    TransitionIndex: 0
+  - IsCrossFadeExit: 0
+    Layer: 0
+    OriginatingState: -1854403429
+    DestinationState: 125937960
+    TransitionDuration: 0.25
+    TriggerNameHash: 125937960
+    TransitionIndex: 1
   m_Animator: {fileID: 7713046344909179739}
 --- !u!114 &5194494003959621184
 MonoBehaviour:
@@ -813,7 +827,7 @@ Rigidbody:
   m_UseGravity: 1
   m_IsKinematic: 0
   m_Interpolate: 1
-  m_Constraints: 80
+  m_Constraints: 112
   m_CollisionDetection: 0
 --- !u!114 &7546346509333126094
 MonoBehaviour:
@@ -899,6 +913,12 @@ MonoBehaviour:
   UpperLimit: -40
   BottomLimit: 70
   LookSensitivity: 21.9
+  JumpFactor: 260
+  AirResistance: 0.8
+  DistanceToGround: 0.8
+  GroundCheck:
+    serializedVersion: 2
+    m_Bits: 1
 --- !u!114 &6525629453705271388
 MonoBehaviour:
   m_ObjectHideFlags: 0
