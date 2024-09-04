@@ -78,11 +78,18 @@ public class ZPlayer : NetworkBehaviour
                 //starterAssetsInputs?.SetCursorState(false);
                 if (!completed)//not already set
                 {
-                    starterAssetsInputs?.SetCursorState(true);
+                    //starterAssetsInputs?.SetCursorState(true);
+                    HideCursor();
                     Debug.Log("not paused not Pregame");
                     completed = true;
                 }
             }
         }
+    }
+
+    private void HideCursor()
+    {
+        Cursor.visible = false;
+        Cursor.lockState = CursorLockMode.Locked;
     }
 }

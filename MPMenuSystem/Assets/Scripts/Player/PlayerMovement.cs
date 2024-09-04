@@ -1,4 +1,5 @@
 ﻿using Cinemachine;
+using Player.Manager;
 using Unity.Netcode;
 using UnityEngine;
 #if ENABLE_INPUT_SYSTEM 
@@ -334,7 +335,8 @@ namespace StarterAssets
             // update animator if using character
             if (_hasAnimator)
             {
-                _animator.SetFloat(_animIDSpeed, _speed);
+                //_speed
+                _animator.SetFloat(_animIDSpeed, _animationBlend);
                 _animator.SetFloat(_animIDMotionSpeed, inputMagnitude);
                 if (_input.move.x > 0.2)
                 {

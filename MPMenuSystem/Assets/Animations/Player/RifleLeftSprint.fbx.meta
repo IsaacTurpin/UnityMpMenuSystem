@@ -1,5 +1,5 @@
 fileFormatVersion: 2
-guid: ab1f8db131b20af468b99fa04d1b1552
+guid: 0d1059cd663304143b1e22ed07ea118a
 ModelImporter:
   serializedVersion: 22200
   internalIDToNameTable: []
@@ -33,11 +33,11 @@ ModelImporter:
     extraUserProperties: []
     clipAnimations:
     - serializedVersion: 16
-      name: RifleBackwardsRun
+      name: RifleLeftSprint
       takeName: mixamo.com
       internalID: -203655887218126122
       firstFrame: 0
-      lastFrame: 18
+      lastFrame: 15
       wrapMode: 0
       orientationOffsetY: 0
       level: 0
