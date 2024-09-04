@@ -16,12 +16,14 @@ namespace Player.Manager
         public Vector2 Look {  get; private set; }
         public bool Run {  get; private set; }
         public bool Jump { get; private set; }
+        public bool Crouch { get; private set; }
 
         private InputActionMap _currentMap;
         private InputAction _moveAction;
         private InputAction _lookAction;
         private InputAction _runAction;
         private InputAction _jumpAction;
+        private InputAction _crouchAction;
 
         private void Awake()
         {
@@ -30,16 +32,19 @@ namespace Player.Manager
             _lookAction = _currentMap.FindAction("Look");
             _runAction = _currentMap.FindAction("Run");
             _jumpAction = _currentMap.FindAction("Jump");
+            _crouchAction = _currentMap.FindAction("Crouch");
 
             _moveAction.performed += OnMove;
             _lookAction.performed += OnLook;
             _runAction.performed += OnRun;
             _jumpAction.performed += OnJump;
+            _crouchAction.started += OnCrouch;
 
             _moveAction.canceled += OnMove;
             _lookAction.canceled += OnLook;
             _runAction.canceled += OnRun;
             _jumpAction.canceled += OnJump;
+            _crouchAction.canceled += OnCrouch;
         }
 
         private void OnMove(InputAction.CallbackContext context)
@@ -61,6 +66,11 @@ namespace Player.Manager
         {
             //If set as tap - add "if(context.interaction is TapInteraction)" before code below
             Jump = context.ReadValueAsButton();
+        }
+
+        private void OnCrouch(InputAction.CallbackContext context)
+        {
+            Crouch = context.ReadValueAsButton();
         }
 
         private void OnEnable()

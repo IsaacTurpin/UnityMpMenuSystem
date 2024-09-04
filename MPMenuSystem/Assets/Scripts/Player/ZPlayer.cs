@@ -13,7 +13,7 @@ public class ZPlayer : NetworkBehaviour
     [Header("References")]
     [SerializeField] private CinemachineVirtualCamera virtualCamera;
     [SerializeField] private Texture2D crosshair;
-    private StarterAssetsInputs starterAssetsInputs;
+    //private StarterAssetsInputs starterAssetsInputs;
     //[field: SerializeField] public Health Health {  get; private set; }
 
     [Header("Settings")]
@@ -51,7 +51,7 @@ public class ZPlayer : NetworkBehaviour
         {
             virtualCamera.Priority = ownerPriority;
 
-            starterAssetsInputs = GetComponent<StarterAssetsInputs>();
+            //starterAssetsInputs = GetComponent<StarterAssetsInputs>();
 
             if (crosshair != null && SceneManager.GetActiveScene().name == "Menu")
             {

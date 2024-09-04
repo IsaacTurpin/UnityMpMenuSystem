@@ -30,6 +30,7 @@ namespace Player.PlayerControl
         private int _groundHash;
         private int _fallingHash;
         private int _zVelHash;
+        private int _crouchHash;
         private float _xRotation;
 
         private const float _walkSpeed = 2f;
@@ -48,6 +49,7 @@ namespace Player.PlayerControl
             _groundHash = Animator.StringToHash("Grounded");
             _fallingHash = Animator.StringToHash("Falling");
             _zVelHash = Animator.StringToHash("Z_Velocity");
+            _crouchHash = Animator.StringToHash("Crouch");
         }
 
         private void FixedUpdate()
@@ -57,6 +59,7 @@ namespace Player.PlayerControl
                 SampleGround();
                 Move();
                 HandleJump();
+                HandleCrouch();
             }
         }
 
@@ -73,6 +76,7 @@ namespace Player.PlayerControl
             if(!_hasAnimator) return;
 
             float targetSpeed = _inputManager.Run ? _runSpeed : _walkSpeed;
+            if (_inputManager.Crouch) targetSpeed = 1.5f;
             if (_inputManager.Move == Vector2.zero) targetSpeed = 0;
 
             if(_grounded)
@@ -109,11 +113,14 @@ namespace Player.PlayerControl
             _playerRigidbody.MoveRotation(_playerRigidbody.rotation * Quaternion.Euler(0, Axis_X * LookSensitivity * Time.smoothDeltaTime, 0));
         }
 
+        private void HandleCrouch() => _animator.SetBool(_crouchHash, _inputManager.Crouch);
+
         private void HandleJump()
         {
             if(!_hasAnimator) return;
             if (!_inputManager.Jump) return;
             if (!_grounded) return;
+            if (_inputManager.Crouch) return;
             _animator.SetTrigger(_jumpHash);
             //For bunny hop
             _playerRigidbody.AddForce(-_playerRigidbody.velocity.y * Vector3.up, ForceMode.VelocityChange);
